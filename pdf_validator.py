@@ -14,16 +14,10 @@ class PDFValidator:
             + url.split('/')[-1]
             + ".pdf"
         )
-    # Medium: use "".join(items) instead, don't re-invent the wheel. And this method is not belongs to the PDFValidator as well
-    def list_to_string(self, items):
-        str = ""
-        for item in items:
-            str += item
-        return str
 
     def parse(self, filepath):
         pages = self.pdf.get_text_from_pdf(filepath)
-        page_1 = self.list_to_string(list(pages.values())[0])
+        page_1 = "".join(list(pages.values())[0])
         investment_name_index = (
             page_1.find("Name of this Investment: ")
             + len("Name of this Investment: ")
@@ -43,8 +37,6 @@ class PDFValidator:
                     individual_investment["link"]
                     )
                 investment_name, uii = self.parse(path)
-                # Low/Medium: I'm not sure print can show on the Robocorp console. Can you try and notify me. If it don't show, I suggest creating logger
-                # to log file
                 if uii != individual_investment["UII"]:
                     print("The UII in the PDF file({}) "
                           "does not match the UII on the web({})"
