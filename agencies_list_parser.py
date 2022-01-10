@@ -13,9 +13,8 @@ class AgenciesListParser:
     def click_main_button(self):
         self.browser.wait_until_element_is_visible(
             locator='//*[@href="#home-dive-in"]',
-            timeout=datetime.timedelta(minutes=5)
+            timeout=datetime.timedelta(seconds=60)
             )
-        # Low: I believe 5 minute timeout is too much for an element to visible. Some where between 20-60 s is more reasonable
 
         self.browser.click_element(
             locator='//*[@href="#home-dive-in"]'

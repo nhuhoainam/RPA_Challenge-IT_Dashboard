@@ -10,17 +10,18 @@ class DetailedInvestmentParser:
         self.browser = Selenium()
         self.browser.open_available_browser(page_url)
         self.files = FileSystem()
-    # Critical: DO NOT use while loop like this. If the file failed to download then your program will be an infinite loop waiting for it forever. Refer to 
-    # https://github.com/kvazarich/IT_Dashboard_RPA_Challenge and use the wait_until_created and with timeout to prevent blocking thread
-    def wait_for_download_to_complete(self, file_name):
-        while self.files.does_file_not_exist(
-                "{}/output/{}.pdf".format(os.getcwd(), file_name)
-                ):
-            continue
 
     def open_and_download_pdf(self, page_url):
+        load_dir = "{}/output".format(os.getcwd())
+        path_to_file = "{}/{}".format(
+            "{}/output".format(os.getcwd()),
+            "{}.pdf".format(page_url.split('/')[-1])
+            )
+        if self.files.does_file_exist(path_to_file):
+            self.files.remove_file(path_to_file)
+            self.files.wait_until_removed(path_to_file)
         self.browser.set_download_directory(
-            directory="{}/output".format(os.getcwd()),
+            directory=load_dir,
             download_pdf=True
             )
         self.browser.open_available_browser(page_url)
@@ -31,19 +32,16 @@ class DetailedInvestmentParser:
         self.browser.click_element(
             locator="css:div#business-case-pdf>a"
             )
-        self.wait_for_download_to_complete(
-            page_url.split('/')[-1]
+        self.files.wait_until_created(
+            path=path_to_file,
+            timeout=60.0*3
             )
-        # Low: By default browser instances created during task execution are closed at the end of the task.
-        # This can be prevented with the auto_close argument when importing the library.
-        # Maybe the below line is unneccessary
         self.browser.close_browser()
 
     def get_individual_investment_list(self):
-        # Low: I believe 5 minute timeout is too much for an element to visible. Some where between 20-60 s is more reasonable
         self.browser.wait_until_element_is_visible(
             locator="css:div#investments-table-widget div.pageSelect select",
-            timeout=datetime.timedelta(minutes=5)
+            timeout=datetime.timedelta(seconds=60)
             )
         self.browser.click_element(
             locator="css:div#investments-table-widget div.pageSelect select"
