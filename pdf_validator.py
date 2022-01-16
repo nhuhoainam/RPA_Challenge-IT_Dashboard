@@ -8,11 +8,11 @@ class PDFValidator:
         self.pdf = PDF()
 
     def get_filepath_from_link(self, url):
-        return (
-            os.getcwd()
-            + '/output/'
-            + url.split('/')[-1]
-            + ".pdf"
+        return (os.path.join(
+            os.getcwd(),
+            "output",
+            "{}.pdf".format(url.split('/')[-1])
+            )
         )
 
     def parse(self, filepath):
@@ -42,10 +42,10 @@ class PDFValidator:
                           "does not match the UII on the web({})"
                           "".format(uii, individual_investment["UII"]))
                 if (investment_name !=
-                        individual_investment["Investment_Title"]):
+                        individual_investment["Investment Title"]):
                     print("The Name of the Investment in the PDF file({}) "
                           "does not match the Investment Title on the web({})"
                           "".format(
                                 investment_name,
-                                individual_investment["Investment_Title"]
+                                individual_investment["Investment Title"]
                                 ))
