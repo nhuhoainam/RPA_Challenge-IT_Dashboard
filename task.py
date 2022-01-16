@@ -16,7 +16,8 @@ def get_detailed_investment(url):
 
 def write_to_excel(data_list, data_table):
     excel = ExcelWriter()
-    excel.write_column(data_list, 1, "spending")
+    excel.write_column(data_list, 1, "name")
+    excel.write_column(data_list, 2, "spending")
     excel.create_new_worksheet("Individual Investments")
     excel.write_table(data_table)
     excel.excel.close_workbook()
