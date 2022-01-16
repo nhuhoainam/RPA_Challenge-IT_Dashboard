@@ -12,9 +12,9 @@ class DetailedInvestmentParser:
         self.files = FileSystem()
 
     def open_and_download_pdf(self, page_url):
-        load_dir = "{}/output".format(os.getcwd())
-        path_to_file = "{}/{}".format(
-            "{}/output".format(os.getcwd()),
+        load_dir = os.path.join(os.getcwd(), "output")
+        path_to_file = os.path.join(
+            load_dir,
             "{}.pdf".format(page_url.split('/')[-1])
             )
         if self.files.does_file_exist(path_to_file):
@@ -37,6 +37,16 @@ class DetailedInvestmentParser:
             timeout=60.0*3
             )
         self.browser.close_browser()
+
+    def get_table_headers(self, table):
+        self.browser.wait_until_element_is_visible(
+            locator=[table, 'css:div.dataTables_scrollHead table th'],
+            timeout=datetime.timedelta(minutes=1)
+        )
+        elements = self.browser.get_webelements(
+            locator=[table, 'css:div.dataTables_scrollHead table th']
+            )
+        return [element.text for element in elements]
 
     def get_individual_investment_list(self):
         self.browser.wait_until_element_is_visible(
@@ -78,19 +88,14 @@ class DetailedInvestmentParser:
             locator="css:div#investments-table-widget",
             timeout=datetime.timedelta(minutes=5)
             )
+        headers = self.get_table_headers("css:div#investments-table-widget")
         data_rows = self.get_individual_investment_list()
         data_list = []
         for row in data_rows:
-            investment = {
-                "link": '',
-                "UII": self.get_investment_element(row, 1),
-                "Bureau": self.get_investment_element(row, 2),
-                "Investment_Title": self.get_investment_element(row, 3),
-                "Total_FY2021_Spending": self.get_investment_element(row, 4),
-                "Type": self.get_investment_element(row, 5),
-                "CIO_Rating": self.get_investment_element(row, 6),
-                "Number_of_Projects": self.get_investment_element(row, 7)
-            }
+            investment = {}
+            for i, header in enumerate(headers):
+                investment[header] = self.get_investment_element(row, i+1)
+            investment["link"] = ''
             count_link = self.browser.get_element_count(
                 locator=[
                     row,
